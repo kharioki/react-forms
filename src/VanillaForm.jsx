@@ -13,13 +13,31 @@ function validate(values) {
 export default function VanillaForm() {
   const [name, setName] = useState('');
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     setErrors(validate({ name }));
   }, [name]);
 
   return (
-    <form>
+    <form
+      onSubmit={event => {
+        event.preventDefault();
+
+        if (Object.keys(validate({ name })).length > 0) {
+          return;
+        }
+
+        setSubmitting(true);
+
+        setTimeout(() => {
+          const values = { name };
+          alert(JSON.stringify(values, null, 2));
+          setSubmitting(false);
+          setName('');
+        }, 500);
+      }}
+    >
       <div className="input-row">
         <label htmlFor="name">Name</label>
         <input
@@ -30,8 +48,15 @@ export default function VanillaForm() {
             setName(event.target.value);
           }}
           value={name}
+          className={errors.name ? 'has-error' : null}
         />
         <Error message={errors.name} />
+      </div>
+
+      <div className="input-row">
+        <button type="submit" disabled={submitting}>
+          Submit
+        </button>
       </div>
     </form>
   );
