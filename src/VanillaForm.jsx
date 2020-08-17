@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Error from './Error';
 
 function validate(values) {
   let errors = {};
@@ -30,9 +31,8 @@ export default function VanillaForm() {
           }}
           value={name}
         />
+        <Error message={errors.name} />
       </div>
-
-      {JSON.stringify(errors)}
     </form>
   );
 }
