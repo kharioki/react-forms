@@ -1,9 +1,24 @@
 import React from 'react';
 import { Formik } from 'formik';
+import * as Yup from 'yup';
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(1, 'Must have a character')
+    .max(255, 'Must be shorter than 255')
+    .required('Must enter a name'),
+  email: Yup.string()
+    .email('Must be a valid email address')
+    .max(255, 'Must be shorter than 255')
+    .required('Must enter email')
+});
 
 const FormikForm = () => {
   return (
-    <Formik initialValues={{ name: '', email: '' }}>
+    <Formik
+      initialValues={{ name: '', email: '' }}
+      validationSchema={validationSchema}
+    >
       {({ values, errors, touched, handleChange, handleBlur }) => (
         <form>
           <div className="input-row">
