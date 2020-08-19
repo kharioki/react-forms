@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import AutoSuggest from 'react-autosuggest';
+import axios from 'axios';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Error from './Error';
@@ -15,6 +17,9 @@ const validationSchema = Yup.object().shape({
 });
 
 const FormikForm = () => {
+  const [country, setCountry] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+
   return (
     <Formik
       initialValues={{ name: '', email: '' }}
@@ -39,6 +44,8 @@ const FormikForm = () => {
         isSubmitting
       }) => (
         <form onSubmit={handleSubmit}>
+          <h3>Some Great Form</h3>
+
           <div className="input-row">
             <label htmlFor="name">Name</label>
             <input
@@ -55,7 +62,7 @@ const FormikForm = () => {
           </div>
 
           <div className="input-row">
-            <label htmlFor="email">EMAIL</label>
+            <label htmlFor="email">Email</label>
             <input
               type="email"
               name="email"
@@ -67,6 +74,48 @@ const FormikForm = () => {
               className={touched.email && errors.email ? 'has-error' : null}
             />
             <Error touched={touched.email} message={errors.email} />
+          </div>
+
+          <div className="input-row">
+            <label htmlFor="country">Country</label>
+            <AutoSuggest
+              inputProps={{
+                placeholder: 'Type your country',
+                autoComplete: 'abcd',
+                name: 'country',
+                id: 'country',
+                value: country,
+                onChange: (_event, { newValue }) => {
+                  setCountry(newValue);
+                }
+              }}
+              suggestions={suggestions}
+              onSuggestionsFetchRequested={async ({ value }) => {
+                if (!value) {
+                  setSuggestions([]);
+                  return;
+                }
+
+                try {
+                  const result = await axios.get(
+                    `https://restcountries.eu/rest/v2/name/${value}`
+                  );
+                  setSuggestions(
+                    result.data.map(row => ({
+                      name: row.name,
+                      flag: row.flag
+                    }))
+                  );
+                } catch (error) {
+                  setSuggestions([]);
+                }
+              }}
+              onSuggestionsClearRequested={() => {
+                setSuggestions([]);
+              }}
+              getSuggestionValue={suggestion => suggestion.name}
+              renderSuggestion={suggestion => <div>{suggestion.name}</div>}
+            />
           </div>
 
           <div className="input-row">
