@@ -14,7 +14,10 @@ const validationSchema = Yup.object().shape({
     .email('Must be a valid email address')
     .max(255, 'Must be shorter than 255')
     .required('Must enter email'),
-  country: Yup.string().required('Must choose a country')
+  country: Yup.string()
+    .min(1, 'Too Short!')
+    .max(255, 'Too Long!')
+    .required('Required')
 });
 
 const FormikForm = () => {
@@ -31,6 +34,7 @@ const FormikForm = () => {
         setTimeout(() => {
           alert(JSON.stringify(values, null, 2));
           resetForm();
+          setCountry('');
           setSubmitting(false);
         }, 500);
       }}
@@ -42,7 +46,8 @@ const FormikForm = () => {
         handleChange,
         handleBlur,
         handleSubmit,
-        isSubmitting
+        isSubmitting,
+        setFieldValue
       }) => (
         <form onSubmit={handleSubmit}>
           <h3>Some Great Form</h3>
@@ -80,18 +85,6 @@ const FormikForm = () => {
           <div className="input-row">
             <label htmlFor="country">Country</label>
             <AutoSuggest
-              inputProps={{
-                placeholder: 'Type your country',
-                autoComplete: 'abcd',
-                name: 'country',
-                id: 'country',
-                value: country,
-                onChange: (_event, { newValue }) => {
-                  setCountry(newValue);
-                },
-                className:
-                  touched.country && errors.country ? 'has-error' : null
-              }}
               suggestions={suggestions}
               onSuggestionsFetchRequested={async ({ value }) => {
                 if (!value) {
@@ -122,9 +115,31 @@ const FormikForm = () => {
                   event.preventDefault();
                 }
                 setCountry(suggestion.name);
+                // set value so Formik knows
+                setFieldValue('country', suggestion.name);
               }}
               getSuggestionValue={suggestion => suggestion.name}
-              renderSuggestion={suggestion => <div>{suggestion.name}</div>}
+              renderSuggestion={suggestion => (
+                <div>
+                  <img
+                    src={suggestion.flag}
+                    alt={suggestion.name}
+                    style={{ width: '25px' }}
+                  />
+                  {suggestion.name}
+                </div>
+              )}
+              inputProps={{
+                placeholder: 'Search for your country',
+                autoComplete: 'abcd',
+                value: country,
+                name: 'country',
+                onChange: (_event, { newValue }) => {
+                  setCountry(newValue);
+                },
+                className:
+                  touched.country && errors.country ? 'has-error' : null
+              }}
             />
             <Error touched={touched.country} message={errors.country} />
           </div>
