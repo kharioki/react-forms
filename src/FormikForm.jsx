@@ -31,6 +31,7 @@ const FormikForm = () => {
               onChange={handleChange}
               onBlur={handleBlur}
               value={values.name}
+              className={touched.name && errors.name ? 'has-error' : null}
             />
           </div>
 
@@ -44,6 +45,7 @@ const FormikForm = () => {
               onChange={handleChange}
               onBlur={handleBlur}
               value={values.email}
+              className={touched.email && errors.email ? 'has-error' : null}
             />
           </div>
 
