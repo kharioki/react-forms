@@ -19,9 +19,26 @@ const FormikForm = () => {
     <Formik
       initialValues={{ name: '', email: '' }}
       validationSchema={validationSchema}
+      onSubmit={(values, { setSubmitting, resetForm }) => {
+        setSubmitting(true);
+
+        setTimeout(() => {
+          alert(JSON.stringify(values, null, 2));
+          resetForm();
+          setSubmitting(false);
+        }, 500);
+      }}
     >
-      {({ values, errors, touched, handleChange, handleBlur }) => (
-        <form>
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        isSubmitting
+      }) => (
+        <form onSubmit={handleSubmit}>
           <div className="input-row">
             <label htmlFor="name">Name</label>
             <input
@@ -53,7 +70,9 @@ const FormikForm = () => {
           </div>
 
           <div className="input-row">
-            <button type="submit">Submit</button>
+            <button type="submit" disabled={isSubmitting}>
+              Submit
+            </button>
           </div>
         </form>
       )}
