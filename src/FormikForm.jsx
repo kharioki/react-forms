@@ -13,7 +13,8 @@ const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email('Must be a valid email address')
     .max(255, 'Must be shorter than 255')
-    .required('Must enter email')
+    .required('Must enter email'),
+  country: Yup.string().required('Must choose a country')
 });
 
 const FormikForm = () => {
@@ -22,7 +23,7 @@ const FormikForm = () => {
 
   return (
     <Formik
-      initialValues={{ name: '', email: '' }}
+      initialValues={{ name: '', email: '', country: '' }}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting, resetForm }) => {
         setSubmitting(true);
@@ -87,7 +88,9 @@ const FormikForm = () => {
                 value: country,
                 onChange: (_event, { newValue }) => {
                   setCountry(newValue);
-                }
+                },
+                className:
+                  touched.country && errors.country ? 'has-error' : null
               }}
               suggestions={suggestions}
               onSuggestionsFetchRequested={async ({ value }) => {
@@ -113,9 +116,17 @@ const FormikForm = () => {
               onSuggestionsClearRequested={() => {
                 setSuggestions([]);
               }}
+              onSuggestionSelected={(event, suggestion, method) => {
+                if (method === 'enter') {
+                  // prevent form from submitting when enter key is selected
+                  event.preventDefault();
+                }
+                setCountry(suggestion.name);
+              }}
               getSuggestionValue={suggestion => suggestion.name}
               renderSuggestion={suggestion => <div>{suggestion.name}</div>}
             />
+            <Error touched={touched.country} message={errors.country} />
           </div>
 
           <div className="input-row">
